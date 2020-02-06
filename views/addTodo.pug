@@ -3,6 +3,6 @@ extends layout
 block content
   form(action="/todos/add", method="POST")
     .form-group
-      label(for='Title') Title
+      label(for='title') Title
       input#title.form-control(type='text', name="title")
     button.btn.btn-primary(type='submit') Add Todo

@@ -3,4 +3,5 @@ extends layout
 block content
   ul
     each todo in todos
-      li=todo.title
+      li
+        a(href="/todos/" + todo.id)=todo.title
