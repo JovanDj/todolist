@@ -17,6 +17,15 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+// Add a todo
+router.get("/add", (req, res) => {
+  try {
+    res.render("addTodo");
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
 /* GET todo */
 router.get("/:id", async (req, res, next) => {
   try {
@@ -25,6 +34,7 @@ router.get("/:id", async (req, res, next) => {
 
     res.render("todo", { todo });
   } catch (error) {
+    res.redirect("/todos");
     throw new Error(error);
   }
 });
@@ -52,7 +62,7 @@ router.post("/edit/:id", async (req, res, next) => {
 });
 
 // Add a todo
-router.get("/add", async (req, res) => {
+router.get("/add", (req, res) => {
   try {
     res.render("addTodo");
   } catch (error) {
@@ -71,6 +81,18 @@ router.post("/add", async (req, res) => {
   try {
     await Todo.create(todo);
     res.redirect("/todos");
+  } catch (error) {
+    throw new Error(error);
+  }
+});
+
+router.delete("/delete/:id", async (req, res) => {
+  try {
+    const todo = await Todo.findByPk(req.params.id);
+
+    await todo.destroy();
+
+    res.json({ message: "Todo deleted." });
   } catch (error) {
     throw new Error(error);
   }

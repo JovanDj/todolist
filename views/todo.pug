@@ -1,6 +1,7 @@
 extends layout
 
 block content
-  h1=todo.title
+  h1=todo.title 
 
-  a(href="/todos/edit/" + todo.id) Edit
+  a(href="/todos/edit/" + todo.id, class='btn btn-info') Edit
+  button(type="button" class='btn btn-danger' onClick="deleteTodo(" + todo.id + ")") Delete
