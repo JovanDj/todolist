@@ -14,7 +14,7 @@ const db = require("./sequelize");
 
 db.authenticate()
   .then(() => {
-    db.sync();
+    db.sync({ alter: true });
     console.log("Connected to the database.");
   })
   .catch(err => {

@@ -1,6 +1,12 @@
 extends layout
 
 block content
-  .jumbotron
-    h1= title
-    p Welcome to #{title}
+  .jumbotron.jumbotron-fluid.bg-light
+    .container
+      h1.display-4 Todolist App
+      p.lead
+        | Task management application
+      hr.my-4
+      p
+        | Track and manage your tasks
+      a.btn.btn-primary.btn-lg(href='/todos' role='button') Start adding tasks

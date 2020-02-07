@@ -1,7 +1,55 @@
 extends layout
 
 block content
-  ul
-    each todo in todos
-      li
-        a(href="/todos/" + todo.id)=todo.title
+  .container
+    if todos.length > 0
+      .d-flex.justify-content-between.align-items-center
+        h1(class="mt-2") Your Tasks
+        .d-flex.justify-content-between.align-items-center
+          a.btn.btn-primary(href="/todos/add") Add Todo
+          form(action="/todos", method="GET")
+            select#filter.custom-select(name="status", onChange="this.form.submit()")
+              option(selected) All
+              option(value='open') Open
+              option(value='in-progress') In progress
+              option(value='complete') Complete
+
+      hr
+
+    if todos.length > 0
+      .row
+        each todo in todos
+          .col-md-4.mt-4
+            .todo.border.rounded-lg.p-2(
+              class={
+                'border-primary': todo.status === 'open',
+                'border-info': todo.status === 'in-progress',
+                'border-success': todo.status === 'complete'
+                }
+              )
+              h2
+                a(
+                  href="/todos/" + todo.id,
+                  class={'strike-through': todo.status === 'complete'})
+                  =todo.title
+                  
+                if todo.status === 'open'
+                  span.badge.badge-primary.float-right Open
+                if todo.status === 'in-progress'
+                  span.badge.badge-info.float-right In Progress
+                if todo.status === 'complete'
+                  span.badge.badge-success.float-right Complete
+              p Description:
+
+              if todo.status === 'in-progress'
+                  button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'complete')") Complete
+              if todo.status === 'open'
+                  button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'in-progress')") Start
+
+
+    else
+      .jumbotron
+        h1.display-4 Looks like you got no tasks saved!
+        hr.my-4
+        
+        a.btn.btn-primary.btn-lg(href='/todos/add' role='button') Create your first task
