@@ -10,16 +10,8 @@ const sassMiddleware = require("node-sass-middleware");
 const indexRouter = require("./routes/index");
 const todosRouter = require("./routes/todos");
 
-const db = require("./sequelize");
 
-db.authenticate()
-  .then(() => {
-    db.sync({ alter: true });
-    console.log("Connected to the database.");
-  })
-  .catch(err => {
-    console.error("Failed connection to the database.", err);
-  });
+
 
 const app = express();
 

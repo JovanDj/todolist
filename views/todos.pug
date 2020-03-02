@@ -8,11 +8,12 @@ block content
         .d-flex.justify-content-between.align-items-center
           a.btn.btn-primary(href="/todos/add") Add Todo
           form(action="/todos", method="GET")
-            select#filter.custom-select(name="status", onChange="this.form.submit()")
-              option(selected) All
-              option(value='open') Open
-              option(value='in-progress') In progress
-              option(value='complete') Complete
+            select#filter.custom-select(name="status", value=statusQuery || 'all', onChange="this.form.submit()")
+              option(selected disabled hidden) Choose status
+              option(value='all' selected=(statusQuery === "all")) All
+              option(value='open' selected=(statusQuery === "open")) Open
+              option(value='in-progress' selected=(statusQuery === "in-progress")) In progress
+              option(value='completed' selected=(statusQuery === "completed")) Complete
 
       hr
 

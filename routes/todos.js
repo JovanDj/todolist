@@ -2,25 +2,25 @@
 
 const express = require("express");
 const router = express.Router();
-const db = require("../sequelize");
-const Todo = require("../models/Todo");
+const models = require("../models");
 
 /** GET todos */
 router.get("/", async (req, res, next) => {
   try {
     let todos;
     const statusQuery = req.query.status;
-
-    if (statusQuery) {
-      todos = await Todo.findAll(
+    console.log(statusQuery)
+    if (statusQuery !== 'all') {
+      todos = await models.Todo.findAll(
         { where: { status: statusQuery } },
         { raw: true }
       );
+        console.log(statusQuery)
 
       res.render("todos", { todos, statusQuery });
     } else {
-      todos = await Todo.findAll({ raw: true });
-      res.render("todos", { todos });
+      todos = await models.Todo.findAll({ raw: true });
+      res.render("todos", { todos, statusQuery: 'all' });
     }
   } catch (error) {
     throw new Error(error);
@@ -39,7 +39,7 @@ router.get("/add", (req, res) => {
 /* GET todo */
 router.get("/:id", async (req, res, next) => {
   try {
-    const todo = await Todo.findByPk(req.params.id, { raw: true });
+    const todo = await models.Todo.findByPk(req.params.id, { raw: true });
     console.log(todo);
 
     res.render("todo", { todo });
@@ -52,7 +52,7 @@ router.get("/:id", async (req, res, next) => {
 /* GET todo edit */
 router.get("/edit/:id", async (req, res, next) => {
   try {
-    const todo = await Todo.findByPk(req.params.id, { raw: true });
+    const todo = await models.Todo.findByPk(req.params.id, { raw: true });
 
     res.render("edit", { todo });
   } catch (error) {
@@ -63,7 +63,7 @@ router.get("/edit/:id", async (req, res, next) => {
 /* EDIT todo */
 router.post("/edit/:id", async (req, res, next) => {
   try {
-    await Todo.update(req.body, { where: { id: req.params.id } });
+    await models.Todo.update(req.body, { where: { id: req.params.id } });
 
     res.redirect(`/todos/${req.params.id}`);
   } catch (error) {
@@ -74,13 +74,13 @@ router.post("/edit/:id", async (req, res, next) => {
 /** Update todo status  */
 router.patch("/edit/:id", async (req, res) => {
   try {
-    await Todo.update(
+    await models.Todo.update(
       { status: req.query.status, timeCompleted: req.query.timeCompleted },
 
       { where: { id: req.params.id } }
     );
 
-    res.json({ message: "Todo status update successfull" });
+    res.json({ message: "models.Todo status update successfull" });
   } catch (error) {
     throw new Error(error);
   }
@@ -104,7 +104,7 @@ router.post("/add", async (req, res) => {
   };
 
   try {
-    await Todo.create(todo);
+    await models.Todo.create(todo);
     res.redirect("/todos");
   } catch (error) {
     throw new Error(error);
@@ -113,11 +113,11 @@ router.post("/add", async (req, res) => {
 
 router.delete("/delete/:id", async (req, res) => {
   try {
-    const todo = await Todo.findByPk(req.params.id);
+    const todo = await models.Todo.findByPk(req.params.id);
 
     await todo.destroy();
 
-    res.json({ message: "Todo deleted." }).status(200);
+    res.json({ message: "models.Todo deleted." }).status(200);
   } catch (error) {
     throw new Error(error);
   }
