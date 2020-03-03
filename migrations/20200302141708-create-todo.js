@@ -9,17 +9,29 @@ module.exports = {
         type: Sequelize.INTEGER
       },
       title: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(64)
       },
       status: {
-        type: Sequelize.ENUM("open", "in-progress", "complete"),
-        defaultValue: "open"
+        type: Sequelize.ENUM("open", "in-progress", "completed"),
+        defaultValue: "open",
+        validate: {
+          isIn: [["open", "in-progress", "completed"]]
+        }
       },
+      description: {
+        type: Sequelize.TEXT
+      },
+
       timeCompleted: {
         type: Sequelize.DATE,
         allowNull: true
       },
       timeStarted: {
+        type: Sequelize.DATE,
+        allowNull: true
+      },
+
+      dueDate: {
         type: Sequelize.DATE,
         allowNull: true
       },

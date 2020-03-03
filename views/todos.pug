@@ -8,7 +8,7 @@ block content
         .d-flex.justify-content-between.align-items-center
           a.btn.btn-primary(href="/todos/add") Add Todo
           form(action="/todos", method="GET")
-            select#filter.custom-select(name="status", value=statusQuery || 'all', onChange="this.form.submit()")
+            select#filter.custom-select(name="status", value=(statusQuery || 'all'), onChange="this.form.submit()")
               option(selected disabled hidden) Choose status
               option(value='all' selected=(statusQuery === "all")) All
               option(value='open' selected=(statusQuery === "open")) Open
@@ -20,34 +20,63 @@ block content
     if todos.length > 0
       .row
         each todo in todos
-          .col-md-4.mt-4
-            .todo.border.rounded-lg.p-2(
-              class={
+
+           
+          .col-md-6
+            .card(class="mb-3" class={
                 'border-primary': todo.status === 'open',
                 'border-info': todo.status === 'in-progress',
-                'border-success': todo.status === 'complete'
-                }
-              )
-              h2
-                a(
-                  href="/todos/" + todo.id,
-                  class={'strike-through': todo.status === 'complete'})
-                  =todo.title
-                  
-                if todo.status === 'open'
-                  span.badge.badge-primary.float-right Open
+                'border-success': todo.status === 'completed'
+            })
+              .card-body
+                h5.card-title= todo.title
+                p.card-text= todo.description
+                
                 if todo.status === 'in-progress'
-                  span.badge.badge-info.float-right In Progress
-                if todo.status === 'complete'
-                  span.badge.badge-success.float-right Complete
-              p Description:
-
-              if todo.status === 'in-progress'
-                  button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'complete')") Complete
-              if todo.status === 'open'
+                  button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'completed')") Complete
+                if todo.status === 'open'
                   button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'in-progress')") Start
+              
+              if todo.status === 'completed'
+                .card-footer(class="bg-transparent border-success")
+                  | Completed #{todo.timeCompletedAgo} at: &nbsp;
+                  = todo.timeCompleted
+
+          //- .col-md-4.mt-4
+          //-   .todo.border.rounded-lg.p-2(
+          //-     class={
+          //-       'border-primary': todo.status === 'open',
+          //-       'border-info': todo.status === 'in-progress',
+          //-       'border-success': todo.status === 'complete'
+          //-       }
+          //-     )
+          //-     h2
+          //-       a(
+          //-         href="/todos/" + todo.id,
+          //-         class={'strike-through': todo.status === 'complete'})
+          //-         =todo.title
+                  
+          //-       if todo.status === 'open'
+          //-         span.badge.badge-primary.float-right Open
+          //-       if todo.status === 'in-progress'
+          //-         span.badge.badge-info.float-right In Progress
+          //-       if todo.status === 'complete'
+          //-         span.badge.badge-success.float-right Complete
+
+          //-     p
+          //-       | Description:
+          //-       = todo.description
+              
+
+          //-     if todo.status === 'in-progress'
+          //-         button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'complete')") Complete
+          //-     if todo.status === 'open'
+          //-         button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'in-progress')") Start
 
 
+    else if todos.length === 0 && statusQuery
+      .jumbotron
+        h1.display-4 There are no todos with status #{statusQuery}
     else
       .jumbotron
         h1.display-4 Looks like you got no tasks saved!

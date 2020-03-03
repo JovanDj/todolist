@@ -5,19 +5,31 @@ module.exports = (sequelize, DataTypes) => {
     "Todo",
     {
       title: {
-        type: DataTypes.STRING,
+        type: DataTypes.STRING(64),
         allowNull: false
       },
       status: {
-        type: DataTypes.ENUM("open", "in-progress", "complete"),
-        defaultValue: "open"
+        type: DataTypes.ENUM("open", "in-progress", "completed"),
+        defaultValue: "open",
+        validate: {
+          isIn: [["open", "in-progress", "completed"]]
+        }
+      },
+
+      dueDate: {
+        type: DataTypes.DATE,
+        allowNull: true
       },
       timeCompleted: {
         type: DataTypes.DATE,
         allowNull: true
       },
       timeStarted: {
-        type: DataTypes.DATE,
+        type: DataTypes.NOW,
+        allowNull: true
+      },
+      description: {
+        type: DataTypes.TEXT("tiny"),
         allowNull: true
       }
     },
@@ -26,9 +38,9 @@ module.exports = (sequelize, DataTypes) => {
       timestamps: true
     }
   );
-  Todo.associate = function (models) {
+  Todo.associate = function(models) {
     // associations can be defined here
-    Todo.belongsTo(models.User)
+    Todo.belongsTo(models.User);
   };
   return Todo;
 };

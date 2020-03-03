@@ -3,27 +3,44 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
+const dayjs = require('dayjs')
+var relativeTime = require('dayjs/plugin/relativeTime')
+var utc = require('dayjs/plugin/utc')
+
+dayjs.extend(relativeTime)
+dayjs.extend(utc)
 
 /** GET todos */
 router.get("/", async (req, res, next) => {
-  try {
-    let todos;
-    const statusQuery = req.query.status;
-    console.log(statusQuery)
-    if (statusQuery !== 'all') {
-      todos = await models.Todo.findAll(
-        { where: { status: statusQuery } },
-        { raw: true }
-      );
-        console.log(statusQuery)
+  let todos;
+  let statusQuery = req.query.status || "all";
 
-      res.render("todos", { todos, statusQuery });
-    } else {
-      todos = await models.Todo.findAll({ raw: true });
-      res.render("todos", { todos, statusQuery: 'all' });
-    }
-  } catch (error) {
-    throw new Error(error);
+  if (statusQuery !== "all") {
+    todos = await models.Todo.findAll(
+      { where: { status: statusQuery } },
+      { raw: true }
+    );
+
+    todos.forEach(todo => {
+      if (todo.timeCompleted) {
+        todo.timeCompleted = dayjs(todo.timeCompleted).format('DD/MM/YYYY')
+        todo.timeCompletedAgo = dayjs().from(todo.timeCompleted, false)
+
+      }
+    });
+
+    res.render("todos", { todos, statusQuery });
+  } else {
+    todos = await models.Todo.findAll({ raw: true });
+
+    todos.forEach(todo => {
+      if (todo.timeCompleted) {
+        todo.timeCompleted = dayjs(todo.timeCompleted).format('DD/MM/YYYY HH:mm')
+        todo.timeCompletedAgo = dayjs.utc().from(todo.timeCompleted, true)
+      }
+    });
+    
+    res.render("todos", { todos, statusQuery: "all" });
   }
 });
 
@@ -73,17 +90,14 @@ router.post("/edit/:id", async (req, res, next) => {
 
 /** Update todo status  */
 router.patch("/edit/:id", async (req, res) => {
-  try {
-    await models.Todo.update(
-      { status: req.query.status, timeCompleted: req.query.timeCompleted },
+  console.log(req.query.status)
 
-      { where: { id: req.params.id } }
-    );
+  await models.Todo.update(
+    { status: req.query.status, timeCompleted: dayjs.utc(req.query.timeCompleted).toISOString() },
+    { where: { id: req.params.id } }
+  );
 
-    res.json({ message: "models.Todo status update successfull" });
-  } catch (error) {
-    throw new Error(error);
-  }
+  res.json({ message: "Todo status update successfull" });
 });
 
 // Add a todo
