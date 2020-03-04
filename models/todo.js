@@ -9,10 +9,16 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false
       },
       status: {
-        type: DataTypes.ENUM("open", "in-progress", "completed"),
+        type: DataTypes.ENUM(
+          "open",
+          "in-progress",
+          "completed",
+          "expired",
+          "aborted"
+        ),
         defaultValue: "open",
         validate: {
-          isIn: [["open", "in-progress", "completed"]]
+          isIn: [["open", "in-progress", "completed", "expired", "aborted"]]
         }
       },
 

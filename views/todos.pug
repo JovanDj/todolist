@@ -36,10 +36,22 @@ block content
                   button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'completed')") Complete
                 if todo.status === 'open'
                   button.btn.btn-primary(type='button', onClick="updateTodoStatus(" + todo.id + ", 'in-progress')") Start
-              
+
+
+
+              if todo.status === 'open'
+                .card-footer(class="bg-transparent text-primary border-primary")
+                  | Created #{todo.createdAgo} ago at: &nbsp;
+                  = todo.createdAt
+
+              if todo.status === 'in-progress'
+                .card-footer(class="bg-transparent text-info border-info")
+                  | Started #{todo.timeStartedAgo} ago at: &nbsp;
+                  = todo.timeStarted
+
               if todo.status === 'completed'
-                .card-footer(class="bg-transparent border-success")
-                  | Completed #{todo.timeCompletedAgo} at: &nbsp;
+                .card-footer(class="bg-transparent text-success border-success")
+                  | Completed #{todo.timeCompletedAgo} ago at: &nbsp;
                   = todo.timeCompleted
 
           //- .col-md-4.mt-4

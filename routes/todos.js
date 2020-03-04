@@ -3,12 +3,12 @@
 const express = require("express");
 const router = express.Router();
 const models = require("../models");
-const dayjs = require('dayjs')
-var relativeTime = require('dayjs/plugin/relativeTime')
-var utc = require('dayjs/plugin/utc')
+const dayjs = require("dayjs");
+var relativeTime = require("dayjs/plugin/relativeTime");
+var utc = require("dayjs/plugin/utc");
 
-dayjs.extend(relativeTime)
-dayjs.extend(utc)
+dayjs.extend(relativeTime);
+dayjs.extend(utc);
 
 /** GET todos */
 router.get("/", async (req, res, next) => {
@@ -21,25 +21,52 @@ router.get("/", async (req, res, next) => {
       { raw: true }
     );
 
-    todos.forEach(todo => {
-      if (todo.timeCompleted) {
-        todo.timeCompleted = dayjs(todo.timeCompleted).format('DD/MM/YYYY')
-        todo.timeCompletedAgo = dayjs().from(todo.timeCompleted, false)
 
+    todos.forEach(todo => {
+
+      todo.createdAt = dayjs(todo.createdAt).format("DD/MM/YYYY");
+      todo.createdAgo = dayjs().from(todo.createdAt, true);
+
+      if (todo.timeCompleted) {
+        todo.timeCompleted = dayjs(todo.timeCompleted).format("DD/MM/YYYY");
+        todo.timeCompletedAgo = dayjs().from(todo.timeCompleted, true);
+      }
+
+      if (todo.timeStarted) {
+        todo.timeStarted = dayjs(todo.timeStarted).format("DD/MM/YYYY HH:mm");
+        todo.timeStartedAgo = dayjs().from(todo.timeStarted, true);
       }
     });
+
+    console.log(todos);
 
     res.render("todos", { todos, statusQuery });
   } else {
     todos = await models.Todo.findAll({ raw: true });
 
+    
+
     todos.forEach(todo => {
-      if (todo.timeCompleted) {
-        todo.timeCompleted = dayjs(todo.timeCompleted).format('DD/MM/YYYY HH:mm')
-        todo.timeCompletedAgo = dayjs.utc().from(todo.timeCompleted, true)
+
+      todo.createdAt = dayjs(todo.createdAt).format("DD/MM/YYYY");
+      todo.createdAgo = dayjs().from(todo.createdAt, true);
+
+      if (todo.status === 'completed') {
+        todo.timeCompleted = dayjs(todo.timeCompleted).format(
+          "DD/MM/YYYY HH:mm"
+        );
+        todo.timeCompletedAgo = dayjs().from(todo.timeCompleted, true)
+    
+      }
+
+      if (todo.status === 'in-progress') {
+        todo.timeStarted = dayjs(todo.timeStarted).format("DD/MM/YYYY HH:mm");
+        todo.timeStartedAgo = dayjs().from(todo.timeStarted, true);
       }
     });
-    
+
+    console.log(todos);
+
     res.render("todos", { todos, statusQuery: "all" });
   }
 });
@@ -90,13 +117,28 @@ router.post("/edit/:id", async (req, res, next) => {
 
 /** Update todo status  */
 router.patch("/edit/:id", async (req, res) => {
-  console.log(req.query.status)
+  const { status, time } = req.query;
+  console.log(status, time);
 
-  await models.Todo.update(
-    { status: req.query.status, timeCompleted: dayjs.utc(req.query.timeCompleted).toISOString() },
-    { where: { id: req.params.id } }
-  );
+  if (status === "in-progress") {
+    await models.Todo.update(
+      {
+        status,
+        timeStarted: dayjs(time).format()
+      },
+      { where: { id: req.params.id } }
+    );
+  }
 
+  if (status === "completed") {
+    await models.Todo.update(
+      {
+        status,
+        timeCompleted: dayjs(time).format()
+      },
+      { where: { id: req.params.id } }
+    );
+  }
   res.json({ message: "Todo status update successfull" });
 });
 

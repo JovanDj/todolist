@@ -12,18 +12,13 @@ async function deleteTodo(id) {
 async function updateTodoStatus(id, status) {
   console.log(id, status)
   try {
-    if (status === "completed") {
       await fetch(
-        `/todos/edit/${id}?status=${status}&timeCompleted=${new Date().toUTCString()}`,
+        `/todos/edit/${id}?status=${status}&time=${new Date()}`,
         {
           method: "PATCH"
         }
       );
-    } else {
-      await fetch(`/todos/edit/${id}?status=${status}`, {
-        method: "PATCH"
-      });
-    }
+    
 
     window.location.replace("/todos");
   } catch (error) {
